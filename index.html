@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PatchPilot | Autonomous Vulnerability Remediation & Security Intelligence</title>
+  <meta name="description" content="AI-driven security remediation engine. Ingest CVEs, SAST alerts, and penetration testing findings, and generate production-ready code patches instantly.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Navigation -->
+  <header class="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="h-9 w-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">P</div>
+        <span class="font-extrabold text-xl tracking-tight text-white">PatchPilot<span class="text-indigo-400">.ai</span></span>
+      </div>
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
+        <a href="#features" class="hover:text-white transition">Architecture</a>
+        <a href="#pipeline" class="hover:text-white transition">Remediation Engine</a>
+        <a href="#security" class="hover:text-white transition">Zero-Trust</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <a href="mailto:contact@patchpilot.me" class="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 transition text-white shadow-md shadow-indigo-600/30">
+          Request Early Access
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-24 pb-20 overflow-hidden">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-semibold text-indigo-300 mb-8">
+        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+        Autonomous Threat Triaging & Remediation Pipeline
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+        Turn Vulnerability Reports into <br class="hidden sm:block"/>
+        <span class="bg-gradient-to-r from-indigo-400 via-sky-300 to-indigo-200 bg-clip-text text-transparent">Verified Code Patches</span> in Seconds.
+      </h1>
+      <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+        PatchPilot ingests SAST findings, dependency CVEs, and penetration testing reports, utilizing contextual LLM reasoning to synthesize production-ready pull requests and verify exploit mitigation.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="mailto:contact@patchpilot.me" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-white shadow-xl shadow-indigo-600/25 transition">
+          Join Pilot Program
+        </a>
+        <a href="#features" class="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 font-semibold text-slate-300 transition">
+          Explore Technical Specs
+        </a>
+      </div>
+    </div>
+
+    <!-- Code Preview Card -->
+    <div class="max-w-4xl mx-auto mt-16 px-6">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-2xl overflow-hidden font-mono text-xs sm:text-sm">
+        <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+            <span class="ml-2 text-slate-400 font-sans text-xs">patchpilot-audit-engine // cve-2024-remediation.diff</span>
+          </div>
+          <span class="text-emerald-400 text-xs font-semibold">Validated Fix Generated</span>
+        </div>
+        <div class="p-6 text-slate-300 space-y-2 overflow-x-auto">
+          <p class="text-slate-500">// Ingested SAST Alert: SQL Injection vulnerability identified in auth/session.py:42</p>
+          <p class="text-rose-400"><span class="text-slate-600 select-none">- </span>cursor.execute(f"SELECT * FROM users WHERE token = '{user_token}'")</p>
+          <p class="text-emerald-400"><span class="text-slate-600 select-none">+ </span>cursor.execute("SELECT * FROM users WHERE token = %s", (user_token,))</p>
+          <p class="text-slate-400 mt-2">// Automated verification: Context AST validates parameterized query escaping.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section id="features" class="py-24 border-t border-slate-900 bg-slate-950/60">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl font-bold text-white mb-4">Architected for Modern DevSecOps</h2>
+        <p class="text-slate-400">Streamline the gap between vulnerability discovery and engineering resolution without introducing regression risks.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="p-8 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 transition">
+          <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold mb-6">01</div>
+          <h3 class="text-xl font-bold text-white mb-2">Multi-Format Ingestion</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Direct support for SARIF outputs, OWASP ZAP alerts, Snyk vulnerability JSON, and custom penetration test report formats.</p>
+        </div>
+        <div class="p-8 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 transition">
+          <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold mb-6">02</div>
+          <h3 class="text-xl font-bold text-white mb-2">Contextual AST Analysis</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Leverages state-of-the-art LLM reasoning models to analyze entire repositories, ensuring generated patches maintain existing architecture integrity.</p>
+        </div>
+        <div class="p-8 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 transition">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold mb-6">03</div>
+          <h3 class="text-xl font-bold text-white mb-2">Automated PR Synthesis</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Directly creates Git branches and pull requests equipped with technical remediation explanations, test suites, and regression checks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Specs -->
+  <section id="pipeline" class="py-20 border-t border-slate-900">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-2xl font-bold text-white mb-4">Enterprise Grade Security & Compliance</h2>
+      <p class="text-slate-400 text-sm mb-10 max-w-xl mx-auto">Designed for strict data isolation. PatchPilot operates statelessly and never stores proprietary codebase artifacts.</p>
+      <div class="inline-grid sm:grid-cols-3 gap-6 text-left w-full">
+        <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/20">
+          <p class="font-bold text-white text-sm">Stateless Execution</p>
+          <p class="text-xs text-slate-400 mt-1">Transient memory containers destroyed post-analysis.</p>
+        </div>
+        <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/20">
+          <p class="font-bold text-white text-sm">Fine-Tuned Guardrails</p>
+          <p class="text-xs text-slate-400 mt-1">Multi-tier hallucination verification on generated syntax.</p>
+        </div>
+        <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/20">
+          <p class="font-bold text-white text-sm">Audit Trail</p>
+          <p class="text-xs text-slate-400 mt-1">Cryptographic verification logs for compliance reviews.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-900 py-12 bg-slate-950">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-slate-500">
+      <div class="flex items-center space-x-2">
+        <span class="font-bold text-slate-300">PatchPilot Technologies</span>
+        <span>© 2026. All rights reserved.</span>
+      </div>
+      <div class="flex space-x-6">
+        <a href="mailto:contact@patchpilot.me" class="hover:text-slate-300">Contact Security Team</a>
+        <a href="#" class="hover:text-slate-300">Terms of Service</a>
+        <a href="#" class="hover:text-slate-300">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
