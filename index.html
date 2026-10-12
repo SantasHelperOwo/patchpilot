@@ -3,9 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PatchPilot | Vulnerability fixes that arrive as tested pull requests</title>
-<meta name="description" content="PatchPilot turns SAST alerts, CVEs and pentest findings into regression-tested pull requests.">
+<title>PatchPilot | Turning security alerts into reviewable fixes</title>
+<meta name="description" content="PatchPilot is an early-stage project that aims to turn SAST findings into tested pull requests using Claude. Concept and interface prototype.">
 <meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PatchPilot | Turning security alerts into reviewable fixes">
+<meta property="og:description" content="Early-stage project: SARIF findings in, tested pull requests out, powered by Claude.">
+<meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%234f46e5'/%3E%3Ctext x='50' y='68' font-size='58' font-weight='700' fill='white' font-family='sans-serif' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,11 +19,11 @@
 tailwind.config={theme:{extend:{fontFamily:{sans:['"Plus Jakarta Sans"','system-ui','sans-serif'],mono:['"JetBrains Mono"','ui-monospace','monospace']}}}}
 </script>
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#070b16;--line:#1e293b}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#070b16}
 html{scroll-behavior:smooth;scroll-padding-top:calc(5rem + env(safe-area-inset-top,0px));background:var(--bg)}
 body{background:var(--bg);color:#e2e8f0;overflow-x:hidden}
-.grid-bg{background-image:radial-gradient(rgba(99,102,241,.14) 1px,transparent 1px);background-size:32px 32px}
-.card{background:rgba(15,23,42,.6);border:1px solid rgba(148,163,184,.12)}
+.grid-bg{background-image:radial-gradient(rgba(99,102,241,.15) 1px,transparent 1px);background-size:32px 32px}
+.card{background:rgba(15,23,42,.7);border:1px solid rgba(148,163,184,.12)}
 :focus-visible{outline:2px solid #818cf8;outline-offset:2px;border-radius:6px}
 details summary{list-style:none;cursor:pointer}details summary::-webkit-details-marker{display:none}
 details[open] .chev{transform:rotate(180deg)}
@@ -36,172 +40,199 @@ details[open] .chev{transform:rotate(180deg)}
     <a href="#top" class="flex items-center gap-2.5">
       <span class="h-8 w-8 rounded-lg bg-indigo-600 grid place-items-center font-bold text-white">P</span>
       <span class="font-bold text-lg text-white">PatchPilot</span>
-      <span class="hidden sm:inline px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Private beta</span>
+      <span class="hidden sm:inline px-2 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">Early stage</span>
     </a>
-    <nav class="hidden md:flex gap-7 text-sm text-slate-400" aria-label="Main">
-      <a class="hover:text-white" href="#demo">Live demo</a>
-      <a class="hover:text-white" href="#how">How it works</a>
-      <a class="hover:text-white" href="#integrations">Integrations</a>
-      <a class="hover:text-white" href="#security">Security</a>
-      <a class="hover:text-white" href="#faq">FAQ</a>
+    <nav class="hidden lg:flex gap-6 text-sm text-slate-400" aria-label="Main">
+      <a class="hover:text-white" href="#problem">Problem</a><a class="hover:text-white" href="#demo">Demo</a>
+      <a class="hover:text-white" href="#status">Status</a><a class="hover:text-white" href="#claude">Claude</a>
+      <a class="hover:text-white" href="#roadmap">Roadmap</a><a class="hover:text-white" href="#team">Team</a>
     </nav>
     <div class="flex items-center gap-2">
-      <a href="#access" class="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white">Request access</a>
-      <button id="menu-btn" class="md:hidden p-2 rounded-lg border border-slate-700 text-slate-300" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+      <a href="#contact" class="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white">Contact</a>
+      <button id="menu-btn" class="lg:hidden p-2 rounded-lg border border-slate-700 text-slate-300" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
     </div>
   </div>
-  <nav id="mobile-nav" class="hidden md:hidden border-t border-slate-800 px-5 py-3 flex flex-col gap-1 text-sm text-slate-300" aria-label="Mobile">
-    <a class="py-2" href="#demo">Live demo</a><a class="py-2" href="#how">How it works</a>
-    <a class="py-2" href="#integrations">Integrations</a><a class="py-2" href="#security">Security</a><a class="py-2" href="#faq">FAQ</a>
+  <nav id="mobile-nav" class="hidden lg:hidden border-t border-slate-800 px-5 py-3 flex flex-col text-sm text-slate-300" aria-label="Mobile">
+    <a class="py-2" href="#problem">Problem</a><a class="py-2" href="#demo">Demo</a><a class="py-2" href="#status">Status</a>
+    <a class="py-2" href="#claude">Claude</a><a class="py-2" href="#roadmap">Roadmap</a><a class="py-2" href="#team">Team</a>
   </nav>
 </header>
 
 <main id="top">
-<section class="pt-16 sm:pt-24 pb-14 px-5">
+<section class="pt-16 sm:pt-24 pb-16 px-5">
   <div class="max-w-4xl mx-auto text-center">
-    <p class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-semibold text-indigo-300 mb-7">
-      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>Works with the scanners you already run
-    </p>
-    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.08] mb-6">Security alerts in. Tested pull requests out.</h1>
-    <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-9 leading-relaxed">PatchPilot reads findings from SAST, dependency scanners and pentest reports, writes a minimal fix, runs your test suite against it, and opens a pull request your team can review.</p>
-
-    <div id="access" class="max-w-md mx-auto">
-      <form id="access-form" class="flex flex-col sm:flex-row gap-2" novalidate>
-        <label for="email" class="sr-only">Work email</label>
-        <input id="email" type="email" autocomplete="email" placeholder="you@company.com" class="flex-1 min-w-0 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500" aria-describedby="form-msg">
-        <button type="submit" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-sm text-white whitespace-nowrap">Join the private beta</button>
-      </form>
-      <p id="form-msg" class="text-sm mt-3 min-h-[1.25rem]" role="status" aria-live="polite"></p>
-      <p class="text-xs text-slate-500 mt-1">Free tier for open-source maintainers and early-stage startups.</p>
+    <p class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-xs font-semibold text-indigo-300 mb-7">A concept and interface prototype, built in public</p>
+    <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.08] mb-6">Security alerts in.<br><span class="bg-gradient-to-r from-indigo-400 via-sky-300 to-indigo-200 bg-clip-text text-transparent">Tested pull requests out.</span></h1>
+    <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-9 leading-relaxed">Scanners flag vulnerabilities faster than small teams can fix them. PatchPilot aims to read a finding, ask Claude for a minimal fix, check it against the project's own tests, and hand developers a pull request to review.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="#demo" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-sm text-white">See the planned flow</a>
+      <a href="#status" class="px-6 py-3 rounded-xl border border-slate-700 hover:bg-slate-900 font-semibold text-sm text-slate-200">What exists today</a>
     </div>
+  </div>
+</section>
 
-    <dl class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto mt-10 text-left">
-      <div class="card rounded-xl px-4 py-3"><dt class="text-xs text-slate-400">Beta target: time to patch</dt><dd class="text-xl font-bold text-white">under 2 min</dd></div>
-      <div class="card rounded-xl px-4 py-3"><dt class="text-xs text-slate-400">Every PR includes</dt><dd class="text-xl font-bold text-white">test results</dd></div>
-      <div class="card rounded-xl px-4 py-3"><dt class="text-xs text-slate-400">Code retained</dt><dd class="text-xl font-bold text-white">none</dd></div>
-      <div class="card rounded-xl px-4 py-3"><dt class="text-xs text-slate-400">Merging</dt><dd class="text-xl font-bold text-white">always human</dd></div>
-    </dl>
+<section id="problem" class="py-16 px-5 border-t border-slate-900 bg-slate-950/50">
+  <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-start">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">Alerts pile up. Fixes don't.</h2>
+      <p class="text-slate-400 leading-relaxed">Static analysis and dependency checkers produce long lists of warnings. Fixing each one means researching the weakness, reading unfamiliar code and writing a safe change, which small engineering teams rarely have time for. The findings sit in a backlog.</p>
+    </div>
+    <div class="card rounded-2xl p-6">
+      <h3 class="font-bold text-white mb-2">Who it is for</h3>
+      <p class="text-sm text-slate-400 leading-relaxed">Developers and small engineering teams, including open-source maintainers, who want an actionable pull request instead of another report. A person always reviews and merges.</p>
+    </div>
   </div>
 </section>
 
 <section id="demo" class="py-16 px-5 border-t border-slate-900">
   <div class="max-w-4xl mx-auto">
     <div class="text-center mb-8">
-      <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">Try a remediation</h2>
-      <p class="text-sm text-slate-400 max-w-xl mx-auto">Pick a finding, then run it. This demo replays example output; it does not scan your code.</p>
+      <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">The planned flow, as a replay</h2>
+      <p class="text-sm text-slate-400 max-w-xl mx-auto">This is an illustration that runs in your browser. It is not connected to a backend and does not scan or fix any code.</p>
     </div>
-    <div role="tablist" aria-label="Vulnerability examples" class="flex flex-wrap justify-center gap-2 mb-4" id="tabs"></div>
-
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/90 overflow-hidden shadow-2xl">
+    <div role="tablist" aria-label="Example findings" class="flex flex-wrap justify-center gap-2 mb-4" id="tabs"></div>
+    <div id="panel" role="tabpanel" class="rounded-2xl border border-slate-800 bg-slate-900/90 overflow-hidden shadow-2xl">
       <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
-        <span id="fname" class="font-mono text-xs text-slate-400"></span>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-rose-500/80"></span><span class="w-3 h-3 rounded-full bg-amber-500/80"></span><span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+          <span id="fname" class="font-mono text-xs text-slate-400 ml-1"></span>
+        </div>
         <div class="flex gap-2">
-          <button id="copy" class="px-3 py-1.5 rounded-md text-xs border border-slate-700 text-slate-300 hover:bg-slate-800 disabled:opacity-40" disabled>Copy patch</button>
-          <button id="run" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-60">Run remediation</button>
+          <button id="copy" class="px-3 py-1.5 rounded-md text-xs border border-slate-700 text-slate-300 hover:bg-slate-800 disabled:opacity-40" disabled>Copy example</button>
+          <button id="run" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-60">Play replay</button>
         </div>
       </div>
       <div class="grid md:grid-cols-[15rem_1fr]">
         <ol id="steps" class="p-5 space-y-3 text-sm border-b md:border-b-0 md:border-r border-slate-800"></ol>
         <div class="p-5 min-w-0">
-          <p id="alert" class="text-xs text-amber-300/90 mb-3"></p>
-          <pre id="diff" class="font-mono text-xs sm:text-[13px] leading-relaxed overflow-x-auto min-h-[150px]" tabindex="0" aria-label="Code diff"></pre>
-          <p id="verdict" class="text-xs text-emerald-400 mt-3 min-h-[1rem]"></p>
+          <p id="alert" class="text-xs text-amber-300/90 mb-3 font-mono"></p>
+          <pre id="diff" class="font-mono text-xs sm:text-[13px] leading-relaxed overflow-x-auto min-h-[160px]" tabindex="0" aria-label="Example code diff"></pre>
+          <p id="verdict" class="text-xs text-slate-400 mt-3 min-h-[1rem]"></p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section id="how" class="py-20 px-5 border-t border-slate-900 bg-slate-950/50">
-  <div class="max-w-6xl mx-auto">
-    <h2 class="text-3xl font-bold text-white text-center mb-3">From alert to review in three stages</h2>
-    <p class="text-sm text-slate-400 text-center max-w-xl mx-auto mb-12">Nothing reaches your main branch without a person approving it.</p>
-    <ol class="grid md:grid-cols-3 gap-6">
-      <li class="card rounded-2xl p-7"><span class="text-indigo-400 font-mono text-sm">Step 1</span><h3 class="text-lg font-bold text-white mt-2 mb-2">Read the finding</h3><p class="text-sm text-slate-400 leading-relaxed">Accepts SARIF files and CVE advisories from your CI webhooks, then traces the tainted data from source to sink through your code.</p></li>
-      <li class="card rounded-2xl p-7"><span class="text-sky-400 font-mono text-sm">Step 2</span><h3 class="text-lg font-bold text-white mt-2 mb-2">Write a small fix</h3><p class="text-sm text-slate-400 leading-relaxed">Generates the narrowest change that removes the vulnerability, keeping your naming, scoping and surrounding logic intact.</p></li>
-      <li class="card rounded-2xl p-7"><span class="text-emerald-400 font-mono text-sm">Step 3</span><h3 class="text-lg font-bold text-white mt-2 mb-2">Prove it, then open the PR</h3><p class="text-sm text-slate-400 leading-relaxed">Builds in an isolated container, runs your tests, re-runs the scanner on the change, and attaches the results to the pull request.</p></li>
-    </ol>
-  </div>
-</section>
-
-<section id="integrations" class="py-20 px-5 border-t border-slate-900">
-  <div class="max-w-5xl mx-auto text-center">
-    <h2 class="text-2xl font-bold text-white mb-3">Fits the workflow you have</h2>
-    <p class="text-sm text-slate-400 mb-10">Integrations are in active development; availability may vary during the beta.</p>
-    <ul class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-xs">
-      <li class="card rounded-xl p-4"><b class="block text-white text-sm">GitHub Actions</b><span class="text-slate-500">Workflow step</span></li>
-      <li class="card rounded-xl p-4"><b class="block text-white text-sm">GitLab CI</b><span class="text-slate-500">Pipeline job</span></li>
-      <li class="card rounded-xl p-4"><b class="block text-white text-sm">Semgrep</b><span class="text-slate-500">SARIF import</span></li>
-      <li class="card rounded-xl p-4"><b class="block text-white text-sm">Snyk</b><span class="text-slate-500">Webhook</span></li>
-      <li class="card rounded-xl p-4"><b class="block text-white text-sm">SonarQube</b><span class="text-slate-500">Issue import</span></li>
-      <li class="card rounded-xl p-4"><b class="block text-white text-sm">Jira, Slack</b><span class="text-slate-500">Status updates</span></li>
-    </ul>
-  </div>
-</section>
-
-<section id="security" class="py-20 px-5 border-t border-slate-900 bg-slate-950/50">
-  <div class="max-w-5xl mx-auto">
-    <h2 class="text-2xl font-bold text-white text-center mb-10">Built for code you cannot share</h2>
-    <div class="grid sm:grid-cols-3 gap-5">
-      <div class="card rounded-xl p-5"><h3 class="font-bold text-white text-sm mb-1">No code retention</h3><p class="text-xs text-slate-400 leading-relaxed">Source is held in memory for the job and deleted after the pull request opens. It is never used for training.</p></div>
-      <div class="card rounded-xl p-5"><h3 class="font-bold text-white text-sm mb-1">Isolated verification</h3><p class="text-xs text-slate-400 leading-relaxed">Generated changes build and test inside sandboxed containers with no access to your secrets or network.</p></div>
-      <div class="card rounded-xl p-5"><h3 class="font-bold text-white text-sm mb-1">Self-hosted option</h3><p class="text-xs text-slate-400 leading-relaxed">Run the orchestrator inside your own VPC or an air-gapped Kubernetes cluster.</p></div>
+<section id="status" class="py-16 px-5 border-t border-slate-900 bg-slate-950/50">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-3">Where we are today</h2>
+    <p class="text-sm text-slate-400 text-center max-w-xl mx-auto mb-10">PatchPilot is a concept with a working website. There is no remediation engine yet, and no customers or benchmark results.</p>
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="card rounded-2xl p-6">
+        <h3 class="font-bold text-emerald-400 mb-3">Built</h3>
+        <ul class="space-y-2 text-sm text-slate-300">
+          <li>Domain, patchpilot.me</li>
+          <li>This site and its in-browser demo replay</li>
+          <li>Inbound email at contact@patchpilot.me</li>
+        </ul>
+      </div>
+      <div class="card rounded-2xl p-6">
+        <h3 class="font-bold text-amber-300 mb-3">Planned</h3>
+        <ul class="space-y-2 text-sm text-slate-300">
+          <li>SARIF and scanner ingestion</li>
+          <li>Code-context and call-graph tracing</li>
+          <li>Patch generation with Claude</li>
+          <li>Running a project's tests against each patch</li>
+          <li>Opening draft pull requests and a GitHub Action</li>
+          <li>Sandboxed verification and no code retention, as design principles for the backend</li>
+          <li>A self-hosted option, later</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="faq" class="py-20 px-5 border-t border-slate-900">
-  <div class="max-w-2xl mx-auto">
-    <h2 class="text-2xl font-bold text-white text-center mb-8">Questions</h2>
-    <div class="space-y-3" id="faq-list"></div>
+<section id="claude" class="py-16 px-5 border-t border-slate-900">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">How we plan to use Claude</h2>
+    <p class="text-slate-400 leading-relaxed mb-4">Claude would sit at the patch-writing step. The pipeline will parse a SARIF finding, collect the vulnerable code and its surrounding context, and send both to Claude through the Anthropic API with a prompt that asks for a minimal unified diff. The diff is then checked before anyone sees it.</p>
+    <p class="text-slate-400 leading-relaxed">This integration is not built yet. We will evaluate current Claude models during Milestone 1 and choose based on fix quality and cost.</p>
   </div>
 </section>
 
-<section class="py-16 px-5 border-t border-slate-900">
-  <div class="max-w-2xl mx-auto text-center">
-    <h2 class="text-2xl font-bold text-white mb-3">Clear your security backlog</h2>
-    <p class="text-sm text-slate-400 mb-6">Join the private beta and get sandbox credentials for one repository.</p>
-    <a href="#access" class="inline-block px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-sm text-white">Request access</a>
+<section id="roadmap" class="py-16 px-5 border-t border-slate-900 bg-slate-950/50">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-10">Roadmap for the first six months</h2>
+    <ol class="grid md:grid-cols-3 gap-5">
+      <li class="card rounded-2xl p-6"><span class="text-indigo-400 font-mono text-sm">Months 1 to 2</span><h3 class="text-lg font-bold text-white mt-2 mb-2">Python command-line tool</h3><p class="text-sm text-slate-400 leading-relaxed">Accept Semgrep SARIF output, format the vulnerable code context, and ask Claude for unified diffs.</p></li>
+      <li class="card rounded-2xl p-6"><span class="text-sky-400 font-mono text-sm">Months 3 to 4</span><h3 class="text-lg font-bold text-white mt-2 mb-2">Local verification</h3><p class="text-sm text-slate-400 leading-relaxed">Use Docker to run a project's existing test suite against each diff before the patch is shown.</p></li>
+      <li class="card rounded-2xl p-6"><span class="text-emerald-400 font-mono text-sm">Months 5 to 6</span><h3 class="text-lg font-bold text-white mt-2 mb-2">GitHub Action</h3><p class="text-sm text-slate-400 leading-relaxed">Package the engine so it opens draft pull requests on open-source test repositories.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="team" class="py-16 px-5 border-t border-slate-900">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-2xl sm:text-3xl font-bold text-white text-center mb-8">Team</h2>
+    <div class="card rounded-2xl p-6 flex gap-5 items-start">
+      <div class="h-14 w-14 shrink-0 rounded-full bg-indigo-600 grid place-items-center text-xl font-bold text-white" aria-hidden="true">AS</div>
+      <div>
+        <h3 class="font-bold text-white">Atip Shrestha</h3>
+        <p class="text-sm text-indigo-300 mb-2">Founder and developer</p>
+        <p class="text-sm text-slate-400 leading-relaxed">Studying BSc (Hons) Ethical Hacking and Cybersecurity at Softwarica College, Nepal. Focused on application security, vulnerability analysis and network fundamentals.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ask" class="py-16 px-5 border-t border-slate-900 bg-slate-950/50">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">What we are asking Anthropic for</h2>
+    <p class="text-slate-400 leading-relaxed">Anthropic API credits to fund development and prompt testing against open-source vulnerability datasets, and developer-tier rate limits so we can run those tests at a useful scale.</p>
+  </div>
+</section>
+
+<section id="contact" class="py-20 px-5 border-t border-slate-900">
+  <div class="max-w-xl mx-auto text-center">
+    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">Get in touch</h2>
+    <p class="text-sm text-slate-400 mb-6">Questions, feedback, or interested in testing early versions? Email goes straight to the founder.</p>
+    <a href="mailto:contact@patchpilot.me?subject=PatchPilot" class="inline-block px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-sm text-white">contact@patchpilot.me</a>
+  </div>
+</section>
+
+<section id="faq" class="py-16 px-5 border-t border-slate-900 bg-slate-950/50">
+  <div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl font-bold text-white text-center mb-8">Questions</h2>
+    <div class="space-y-3" id="faq-list"></div>
   </div>
 </section>
 </main>
 
 <footer class="border-t border-slate-900 py-10 px-5">
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-    <p><b class="text-slate-300">PatchPilot Technologies</b> &copy; 2026</p>
-    <div class="flex gap-5"><a class="hover:text-slate-300" href="mailto:contact@patchpilot.me">contact@patchpilot.me</a><a class="hover:text-slate-300" href="mailto:contact@patchpilot.me?subject=Security%20whitepaper">Request whitepaper</a></div>
+    <p><b class="text-slate-300">PatchPilot</b> &copy; 2026. Early-stage project.</p>
+    <a class="hover:text-slate-300" href="mailto:contact@patchpilot.me">contact@patchpilot.me</a>
   </div>
 </footer>
 
 <script>
 const DATA={
-sqli:{label:'SQL injection (Python)',file:'services/auth/session.py',alert:'CWE-89 · Unescaped string formatting reaches cursor.execute() at session.py:42',
- diff:[['c','# before'],['-','query = f"SELECT user_id, tier FROM sessions WHERE token = \'{raw_token}\'"'],['-','cursor.execute(query)'],['c','# after'],['+','query = "SELECT user_id, tier FROM sessions WHERE token = %s"'],['+','cursor.execute(query, (raw_token,))']],
- verdict:'Parameterized query confirmed. 48 tests passed. Exploit payload now returns no rows.'},
-ssrf:{label:'SSRF (Go)',file:'internal/webhook/dispatcher.go',alert:'CWE-918 · User-controlled URL reaches http.Get() at dispatcher.go:88',
- diff:[['c','// before'],['-','resp, err := http.Get(targetURL)'],['c','// after'],['+','if err := validatePublicIP(targetURL); err != nil {'],['+','    return nil, ErrForbiddenTarget'],['+','}'],['+','resp, err := safeClient.Get(targetURL)']],
- verdict:'Private and metadata addresses are rejected. 112 tests passed. Re-scan found no SSRF finding.'},
-proto:{label:'Prototype pollution (Node)',file:'src/utils/deepMerge.js',alert:'CWE-1321 · Unfiltered keys assigned in recursive merge at deepMerge.js:19',
- diff:[['c','// before'],['-','for (const key of Object.keys(source)) { target[key] = source[key]; }'],['c','// after'],['+','for (const key of Object.keys(source)) {'],['+',"  if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;"],['+','  target[key] = source[key];'],['+','}']],
- verdict:'Dangerous keys skipped before assignment. 74 tests passed. Pollution proof-of-concept fails.'}
+sqli:{label:'SQL injection (Python)',file:'services/auth/session.py',alert:'CWE-89 · Unescaped string formatting reaches cursor.execute()',
+ diff:[['c','# before'],['-','query = f"SELECT user_id, tier FROM sessions WHERE token = \'{raw_token}\'"'],['-','cursor.execute(query)'],['c','# after'],['+','query = "SELECT user_id, tier FROM sessions WHERE token = %s"'],['+','cursor.execute(query, (raw_token,))']]},
+ssrf:{label:'SSRF (Go)',file:'internal/webhook/dispatcher.go',alert:'CWE-918 · User-controlled URL reaches http.Get()',
+ diff:[['c','// before'],['-','resp, err := http.Get(targetURL)'],['c','// after'],['+','if err := validatePublicIP(targetURL); err != nil {'],['+','    return nil, ErrForbiddenTarget'],['+','}'],['+','resp, err := safeClient.Get(targetURL)']]},
+proto:{label:'Prototype pollution (Node)',file:'src/utils/deepMerge.js',alert:'CWE-1321 · Unfiltered keys assigned in recursive merge',
+ diff:[['c','// before'],['-','for (const key of Object.keys(source)) { target[key] = source[key]; }'],['c','// after'],['+','for (const key of Object.keys(source)) {'],['+',"  if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;"],['+','  target[key] = source[key];'],['+','}']]}
 };
-const STEPS=['Parse alert','Trace data flow','Generate patch','Run test suite','Re-scan and open PR'];
+const STEPS=['Parse finding','Collect code context','Ask Claude for a diff','Run project tests','Open draft pull request'];
+const VERDICT='Illustration only. No model was called and no tests were run.';
 const $=id=>document.getElementById(id);
 let cur='sqli',busy=false,timers=[];
+const flash=(b,ok,idle)=>{b.textContent=ok;setTimeout(()=>b.textContent=idle,1500)};
 
-const tabs=$('tabs');
 Object.keys(DATA).forEach(k=>{
   const b=document.createElement('button');
-  b.id='tab-'+k;b.setAttribute('role','tab');b.textContent=DATA[k].label;
-  b.className='px-4 py-2 rounded-lg text-xs font-medium';
+  b.id='tab-'+k;b.setAttribute('role','tab');b.setAttribute('aria-controls','panel');b.textContent=DATA[k].label;
   b.addEventListener('click',()=>select(k));
   b.addEventListener('keydown',e=>{
-    const ks=Object.keys(DATA),i=ks.indexOf(k);
-    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const n=ks[(i+(e.key==='ArrowRight'?1:ks.length-1))%ks.length];select(n);$('tab-'+n).focus();}
+    if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+    e.preventDefault();const ks=Object.keys(DATA),i=ks.indexOf(k);
+    const n=ks[(i+(e.key==='ArrowRight'?1:ks.length-1))%ks.length];select(n);$('tab-'+n).focus();
   });
-  tabs.appendChild(b);
+  $('tabs').appendChild(b);
 });
 
 function renderSteps(state){
@@ -216,8 +247,9 @@ function renderSteps(state){
 }
 function renderDiff(show){
   const pre=$('diff');pre.innerHTML='';
-  if(!show){pre.textContent='Press “Run remediation” to generate the patch.';pre.className=pre.className.replace(/text-\S+/g,'')+' text-slate-500';return;}
-  pre.className='font-mono text-xs sm:text-[13px] leading-relaxed overflow-x-auto min-h-[150px]';
+  const base='font-mono text-xs sm:text-[13px] leading-relaxed overflow-x-auto min-h-[160px]';
+  if(!show){pre.textContent='Press “Play replay” to see an example diff.';pre.className=base+' text-slate-500';return;}
+  pre.className=base;
   DATA[cur].diff.forEach(([t,txt])=>{
     const l=document.createElement('div');
     l.className=t==='-'?'text-rose-400':t==='+'?'text-emerald-400':'text-slate-500';
@@ -228,7 +260,7 @@ function reset(){
   timers.forEach(clearTimeout);timers=[];busy=false;
   const d=DATA[cur];
   $('fname').textContent=d.file;$('alert').textContent=d.alert;$('verdict').textContent='';
-  $('run').disabled=false;$('run').textContent='Run remediation';$('copy').disabled=true;
+  $('run').disabled=false;$('run').textContent='Play replay';$('copy').disabled=true;
   renderSteps(-1);renderDiff(false);
 }
 function select(k){
@@ -238,56 +270,44 @@ function select(k){
     b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;
     b.className='px-4 py-2 rounded-lg text-xs font-medium '+(on?'bg-indigo-600 text-white':'bg-slate-900 hover:bg-slate-800 text-slate-400 border border-slate-800');
   });
+  $('panel').setAttribute('aria-labelledby','tab-'+k);
   reset();
 }
 $('run').addEventListener('click',()=>{
   if(busy)return;reset();busy=true;
-  $('run').disabled=true;$('run').textContent='Running…';
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,gap=reduce?0:450;
+  $('run').disabled=true;$('run').textContent='Playing…';
+  const gap=matchMedia('(prefers-reduced-motion: reduce)').matches?0:420;
   STEPS.forEach((_,i)=>timers.push(setTimeout(()=>renderSteps(i),i*gap)));
   timers.push(setTimeout(()=>{
-    renderSteps(STEPS.length);renderDiff(true);
-    $('verdict').textContent=DATA[cur].verdict;
-    $('run').disabled=false;$('run').textContent='Run again';$('copy').disabled=false;busy=false;
+    renderSteps(STEPS.length);renderDiff(true);$('verdict').textContent=VERDICT;
+    $('run').disabled=false;$('run').textContent='Play again';$('copy').disabled=false;busy=false;
   },STEPS.length*gap));
 });
 $('copy').addEventListener('click',async()=>{
-  const txt=DATA[cur].diff.filter(x=>x[0]==='+').map(x=>x[1]).join('\n');
   const b=$('copy');
-  try{await navigator.clipboard.writeText(txt);b.textContent='Copied';}
-  catch(e){b.textContent='Copy failed';}
-  setTimeout(()=>b.textContent='Copy patch',1500);
+  try{await navigator.clipboard.writeText(DATA[cur].diff.filter(x=>x[0]==='+').map(x=>x[1]).join('\n'));flash(b,'Copied','Copy example');}
+  catch(e){flash(b,'Copy failed','Copy example');}
 });
 
 const FAQ=[
-['Does PatchPilot merge code on its own?','No. It only opens pull requests. Your normal review and branch protection rules still decide what merges.'],
-['What happens if the tests fail?','The patch is discarded or revised. If no passing fix is found, PatchPilot opens an issue with the analysis instead of a pull request.'],
-['Which languages are supported?','Python, Go and JavaScript or TypeScript are the focus of the beta. More are planned based on waitlist demand.'],
-['Do you train models on my code?','No. Code is processed for the job and deleted afterwards.'],
-['Are the numbers on this page guaranteed?','They are beta targets from internal testing, not guarantees. Results depend on your codebase and test coverage.']
+['Does PatchPilot work today?','Not yet. Today it is a concept with a website and an in-browser demo replay. The roadmap above describes how the real engine will be built.'],
+['Will it merge code automatically?','No. The plan is to open draft pull requests only. A developer reviews and merges.'],
+['Are the demo examples real results?','No. They are hand-written illustrations of the kind of fix PatchPilot aims to produce. No model was called and no tests were run.'],
+['Which model will it use?','Claude, through the Anthropic API. We will evaluate current Claude models in the first milestone.'],
+['Do you have customers or benchmarks?','Not yet. Early feedback from developers and open-source maintainers is welcome at contact@patchpilot.me.']
 ];
-const fl=$('faq-list');
 FAQ.forEach(([q,a])=>{
   const d=document.createElement('details');d.className='card rounded-xl px-5 py-4';
   const s=document.createElement('summary');s.className='flex items-center justify-between gap-4 text-sm font-semibold text-white';
   s.innerHTML='<span></span><svg class="chev shrink-0 transition-transform" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>';
   s.firstChild.textContent=q;
   const p=document.createElement('p');p.className='text-sm text-slate-400 mt-3 leading-relaxed';p.textContent=a;
-  d.append(s,p);fl.appendChild(d);
+  d.append(s,p);$('faq-list').appendChild(d);
 });
 
 const mb=$('menu-btn'),mn=$('mobile-nav');
-mb.addEventListener('click',()=>{const o=mn.classList.toggle('hidden')===false;mb.setAttribute('aria-expanded',o);});
+mb.addEventListener('click',()=>{mb.setAttribute('aria-expanded',mn.classList.toggle('hidden')===false);});
 mn.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mn.classList.add('hidden');mb.setAttribute('aria-expanded','false');}));
-
-$('access-form').addEventListener('submit',e=>{
-  e.preventDefault();
-  const v=$('email').value.trim(),m=$('form-msg');
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){m.className='text-sm mt-3 text-rose-400';m.textContent='Enter a valid work email, like you@company.com.';return;}
-  try{localStorage.setItem('pp_waitlist_email',v);}catch(_){}
-  m.className='text-sm mt-3 text-emerald-400';m.textContent='Thanks. You are on the list; we will email sandbox credentials soon.';
-  $('email').value='';
-});
 
 select('sqli');
 </script>
