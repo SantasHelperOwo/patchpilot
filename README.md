@@ -16,22 +16,37 @@ An early-stage experiment: take a static-analysis finding (SARIF), ask Claude fo
 - Sandboxed verification
 - Benchmarks or accuracy numbers. There are none.
 
-The prototype only suggests a diff. It does not apply it, verify it, or guarantee it is correct. Always review generated code yourself.
+The prototype only *suggests* a diff. It does not apply it, verify it, or guarantee it is correct. Always review generated code yourself.
 
 ## Try it
 
+**Windows (Command Prompt):**
+```
+py -m pip install -r requirements.txt
+set ANTHROPIC_API_KEY=your_key_here
+py src\patchpilot.py --sarif examples\sample.sarif --root examples --dry-run
+py src\patchpilot.py --sarif examples\sample.sarif --root examples
+```
+
+**Mac / Linux:**
 ```bash
 pip install -r requirements.txt
 export ANTHROPIC_API_KEY=your_key_here    # never commit your key
-
-# See the prompt without calling the API (no key needed):
 python src/patchpilot.py --sarif examples/sample.sarif --root examples --dry-run
-
-# Ask Claude for a suggested diff:
 python src/patchpilot.py --sarif examples/sample.sarif --root examples
 ```
 
-Set `PATCHPILOT_MODEL` to choose a Claude model (default: `claude-sonnet-5-5`).
+`--dry-run` prints the prompt and needs no API key. Useful options: `--out diffs` saves each diff to a file, `--max-findings` caps API calls (default 5), `--attempts` sets retries (default 2). Set `PATCHPILOT_MODEL` to choose a Claude model (default: `claude-sonnet-5-5`).
+
+Before showing a diff, the tool checks that the diff's context matches the real file and retries once if not. It does not run your tests.
+
+## Tests
+
+```
+py -m unittest discover -s tests -v
+```
+
+The tests run offline with a simulated API response. The live Claude call itself has not been benchmarked.
 
 ## Roadmap
 
@@ -44,7 +59,3 @@ Set `PATCHPILOT_MODEL` to choose a Claude model (default: `claude-sonnet-5-5`).
 Atip Shrestha, BSc (Hons) Ethical Hacking and Cybersecurity student, Softwarica College, Nepal. Solo, self-funded project started October 2026.
 
 Contact: contact@patchpilot.me
-
-## License
-
-Licensed under the MIT License.
